@@ -30,7 +30,13 @@ from ._types import _BaseCommand
 from .cog import Cog
 from .context import Context
 from .converter import Greedy, get_converter, run_converters
-from .cooldowns import BucketType, Cooldown, CooldownMapping, DynamicCooldownMapping, MaxConcurrency
+from .cooldowns import (
+    BucketType,
+    Cooldown,
+    CooldownMapping,
+    DynamicCooldownMapping,
+    MaxConcurrency,
+)
 from .errors import *
 
 if TYPE_CHECKING:
@@ -45,27 +51,27 @@ __all__ = (
     "Command",
     "Group",
     "GroupMixin",
-    "command",
-    "group",
-    "has_role",
-    "has_permissions",
-    "has_any_role",
+    "after_invoke",
+    "before_invoke",
+    "bot_has_any_role",
+    "bot_has_guild_permissions",
+    "bot_has_permissions",
+    "bot_has_role",
     "check",
     "check_any",
-    "before_invoke",
-    "after_invoke",
-    "bot_has_role",
-    "bot_has_permissions",
-    "bot_has_any_role",
+    "command",
     "cooldown",
-    "dynamic_cooldown",
-    "max_concurrency",
     "dm_only",
+    "dynamic_cooldown",
+    "group",
     "guild_only",
-    "is_owner",
-    "is_nsfw",
+    "has_any_role",
     "has_guild_permissions",
-    "bot_has_guild_permissions",
+    "has_permissions",
+    "has_role",
+    "is_nsfw",
+    "is_owner",
+    "max_concurrency",
 )
 
 MISSING: Any = nextcord.utils.MISSING
@@ -640,7 +646,10 @@ class Command(_BaseCommand, Generic[CogT, P, T]):
             if required:
                 if self._is_typing_optional(param.annotation):
                     return None
-                if hasattr(converter, "__commands_is_flag__") and converter._can_be_constructible():
+                if (
+                    hasattr(converter, "__commands_is_flag__")
+                    and converter._can_be_constructible()
+                ):
                     return await converter._construct_default(ctx)
                 raise MissingRequiredArgument(param)
             return param.default
@@ -745,7 +754,7 @@ class Command(_BaseCommand, Generic[CogT, P, T]):
         # added via GroupMixin.add_command etc.
         # This should probably be checked as it is quite the typing issue.
         while command.parent is not None:  # type: ignore
-            command = command.parent  # type: ignore
+            command = command.parent
             entries.append(command.name)  # type: ignore
 
         return " ".join(reversed(entries))
@@ -763,7 +772,7 @@ class Command(_BaseCommand, Generic[CogT, P, T]):
         entries = []
         command = self
         while command.parent is not None:  # type: ignore
-            command = command.parent  # type: ignore
+            command = command.parent
             entries.append(command)
 
         return entries

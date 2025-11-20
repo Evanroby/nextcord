@@ -39,10 +39,10 @@ from ..mixins import Hashable
 from ..user import BaseUser, User
 
 __all__ = (
-    "Webhook",
-    "WebhookMessage",
     "PartialWebhookChannel",
     "PartialWebhookGuild",
+    "Webhook",
+    "WebhookMessage",
 )
 
 _log = logging.getLogger(__name__)
@@ -599,8 +599,8 @@ def handle_message_parameters(
     return ExecuteWebhookParameters(payload=payload, multipart=multipart, files=files)
 
 
-async_context: ContextVar[AsyncWebhookAdapter] = ContextVar(
-    "async_webhook_context", default=AsyncWebhookAdapter()
+async_context: ContextVar[Optional[AsyncWebhookAdapter]] = ContextVar(
+    "async_webhook_context", default=None
 )
 
 
@@ -644,7 +644,7 @@ class PartialWebhookGuild(Hashable):
         The partial guild's name.
     """
 
-    __slots__ = ("id", "name", "_icon", "_state")
+    __slots__ = ("_icon", "_state", "id", "name")
 
     def __init__(self, *, data, state) -> None:
         self._state = state
@@ -860,18 +860,18 @@ class WebhookMessage(Message):
 
 class BaseWebhook(Hashable):
     __slots__: Tuple[str, ...] = (
-        "id",
-        "type",
-        "guild_id",
-        "channel_id",
-        "token",
-        "auth_token",
-        "user",
-        "name",
         "_avatar",
+        "_state",
+        "auth_token",
+        "channel_id",
+        "guild_id",
+        "id",
+        "name",
         "source_channel",
         "source_guild",
-        "_state",
+        "token",
+        "type",
+        "user",
     )
 
     def __init__(
@@ -1062,7 +1062,12 @@ class Webhook(BaseWebhook):
 
     @classmethod
     def partial(
-        cls, id: int, token: str, *, session: aiohttp.ClientSession, bot_token: Optional[str] = None
+        cls,
+        id: int,
+        token: str,
+        *,
+        session: aiohttp.ClientSession,
+        bot_token: Optional[str] = None,
     ) -> Webhook:
         """Creates a partial :class:`Webhook`.
 
@@ -1205,11 +1210,16 @@ class Webhook(BaseWebhook):
             The fetched webhook.
         """
         adapter = async_context.get()
+        if adapter is None:
+            adapter = AsyncWebhookAdapter()
+            async_context.set(adapter)
 
         if prefer_auth and self.auth_token:
             data = await adapter.fetch_webhook(self.id, self.auth_token, session=self.session)
         elif self.token:
-            data = await adapter.fetch_webhook_with_token(self.id, self.token, session=self.session)
+            data = await adapter.fetch_webhook_with_token(
+                self.id, self.token, session=self.session
+            )
         else:
             raise InvalidArgument("This webhook does not have a token associated with it")
 
@@ -1247,6 +1257,9 @@ class Webhook(BaseWebhook):
             raise InvalidArgument("This webhook does not have a token associated with it")
 
         adapter = async_context.get()
+        if adapter is None:
+            adapter = AsyncWebhookAdapter()
+            async_context.set(adapter)
 
         if prefer_auth and self.auth_token:
             await adapter.delete_webhook(
@@ -1315,6 +1328,9 @@ class Webhook(BaseWebhook):
             payload["avatar"] = await utils.obj_to_base64_data(avatar)
 
         adapter = async_context.get()
+        if adapter is None:
+            adapter = AsyncWebhookAdapter()
+            async_context.set(adapter)
 
         data: Optional[WebhookPayload] = None
         # If a channel is given, always use the authenticated endpoint
@@ -1564,6 +1580,9 @@ class Webhook(BaseWebhook):
             thread_name=thread_name,
         )
         adapter = async_context.get()
+        if adapter is None:
+            adapter = AsyncWebhookAdapter()
+            async_context.set(adapter)
 
         data = await adapter.execute_webhook(
             self.id,
@@ -1622,6 +1641,9 @@ class Webhook(BaseWebhook):
             raise InvalidArgument("This webhook does not have a token associated with it")
 
         adapter = async_context.get()
+        if adapter is None:
+            adapter = AsyncWebhookAdapter()
+            async_context.set(adapter)
         data = await adapter.get_webhook_message(
             self.id,
             self.token,
@@ -1738,6 +1760,9 @@ class Webhook(BaseWebhook):
             previous_allowed_mentions=previous_mentions,
         )
         adapter = async_context.get()
+        if adapter is None:
+            adapter = AsyncWebhookAdapter()
+            async_context.set(adapter)
         thread_id: Optional[int] = None
         if thread is not MISSING:
             thread_id = thread.id
@@ -1784,6 +1809,9 @@ class Webhook(BaseWebhook):
             raise InvalidArgument("This webhook does not have a token associated with it")
 
         adapter = async_context.get()
+        if adapter is None:
+            adapter = AsyncWebhookAdapter()
+            async_context.set(adapter)
         await adapter.delete_webhook_message(
             self.id,
             self.token,

@@ -29,9 +29,9 @@ if TYPE_CHECKING:
 
 
 __all__ = (
-    "Component",
     "ActionRow",
     "Button",
+    "Component",
     "SelectMenu",
     "SelectOption",
     "TextInput",
@@ -106,13 +106,15 @@ class ActionRow(Component):
         The children components that this holds, if any.
     """
 
-    __slots__: Tuple[str, ...] = ("type", "children")
+    __slots__: Tuple[str, ...] = ("children", "type")
 
     __repr_info__: ClassVar[Tuple[str, ...]] = __slots__
 
     def __init__(self, data: ComponentPayload) -> None:
         self.type: ComponentType = try_enum(ComponentType, data["type"])
-        self.children: List[Component] = [_component_factory(d) for d in data.get("components", [])]
+        self.children: List[Component] = [
+            _component_factory(d) for d in data.get("components", [])
+        ]
 
     def to_dict(self) -> ActionRowPayload:
         return {
@@ -151,13 +153,13 @@ class Button(Component):
     """
 
     __slots__: Tuple[str, ...] = (
-        "type",
-        "style",
         "custom_id",
-        "url",
         "disabled",
-        "label",
         "emoji",
+        "label",
+        "style",
+        "type",
+        "url",
     )
 
     __repr_info__: ClassVar[Tuple[str, ...]] = __slots__
@@ -216,9 +218,9 @@ class SelectMenuBase(Component):
     __slots__: Tuple[str, ...] = (
         "custom_id",
         "disabled",
-        "placeholder",
-        "min_values",
         "max_values",
+        "min_values",
+        "placeholder",
     )
 
     __repr_info__: ClassVar[Tuple[str, ...]] = __slots__
@@ -506,11 +508,11 @@ class SelectOption:
     """
 
     __slots__: Tuple[str, ...] = (
-        "label",
-        "value",
+        "default",
         "description",
         "emoji",
-        "default",
+        "label",
+        "value",
     )
 
     def __init__(
@@ -582,15 +584,15 @@ class SelectOption:
 
 class TextInput(Component):
     __slots__: Tuple[str, ...] = (
-        "type",
-        "style",
         "custom_id",
         "label",
-        "min_length",
         "max_length",
-        "required",
-        "value",
+        "min_length",
         "placeholder",
+        "required",
+        "style",
+        "type",
+        "value",
     )
 
     __repr_info__: ClassVar[Tuple[str, ...]] = __slots__

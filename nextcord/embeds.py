@@ -23,7 +23,9 @@ class EmbedProxy:
         return len(self.__dict__)
 
     def __repr__(self) -> str:
-        inner = ", ".join((f"{k}={v!r}" for k, v in self.__dict__.items() if not k.startswith("_")))
+        inner = ", ".join(
+            (f"{k}={v!r}" for k, v in self.__dict__.items() if not k.startswith("_"))
+        )
         return f"EmbedProxy({inner})"
 
     def __getattr__(self, _: str) -> None:
@@ -123,19 +125,19 @@ class Embed:
     """
 
     __slots__ = (
-        "title",
-        "url",
-        "type",
-        "_timestamp",
+        "_author",
         "_colour",
+        "_fields",
         "_footer",
         "_image",
-        "_thumbnail",
-        "_video",
         "_provider",
-        "_author",
-        "_fields",
+        "_thumbnail",
+        "_timestamp",
+        "_video",
         "description",
+        "title",
+        "type",
+        "url",
     )
 
     def __init__(
@@ -698,7 +700,9 @@ class Embed:
         else:
             if timestamp:
                 if timestamp.tzinfo:
-                    result["timestamp"] = timestamp.astimezone(tz=datetime.timezone.utc).isoformat()
+                    result["timestamp"] = timestamp.astimezone(
+                        tz=datetime.timezone.utc
+                    ).isoformat()
                 else:
                     result["timestamp"] = timestamp.replace(
                         tzinfo=datetime.timezone.utc

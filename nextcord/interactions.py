@@ -385,6 +385,9 @@ class Interaction(Hashable, Generic[ClientT]):
             raise ClientException("Channel for message could not be resolved")
 
         adapter = async_context.get()
+        if adapter is None:
+            raise ClientException("Adapter context is not available")
+
         data = await adapter.get_original_interaction_response(
             application_id=self.application_id,
             token=self.token,
@@ -571,6 +574,9 @@ class Interaction(Hashable, Generic[ClientT]):
             previous_allowed_mentions=previous_mentions,
         )
         adapter = async_context.get()
+        if adapter is None:
+            raise ClientException("Adapter context is not available")
+
         data = await adapter.edit_original_interaction_response(
             self.application_id,
             self.token,
@@ -613,6 +619,9 @@ class Interaction(Hashable, Generic[ClientT]):
             Deleted a message that is not yours.
         """
         adapter = async_context.get()
+        if adapter is None:
+            raise ClientException("Adapter context is not available")
+
         delete_func = adapter.delete_original_interaction_response(
             self.application_id,
             self.token,
@@ -820,6 +829,9 @@ class InteractionResponse:
 
         if defer_type:
             adapter = async_context.get()
+            if adapter is None:
+                raise ClientException("Adapter context is not available")
+
             await adapter.create_interaction_response(
                 parent.id, parent.token, session=parent._session, type=defer_type, data=data
             )
@@ -845,6 +857,9 @@ class InteractionResponse:
         parent = self._parent
         if parent.type is InteractionType.ping:
             adapter = async_context.get()
+            if adapter is None:
+                raise ClientException("Adapter context is not available")
+
             await adapter.create_interaction_response(
                 parent.id,
                 parent.token,
@@ -884,6 +899,9 @@ class InteractionResponse:
         payload = {"choices": choice_list}
 
         adapter = async_context.get()
+        if adapter is None:
+            raise ClientException("Adapter context is not available")
+
         await adapter.create_interaction_response(
             self._parent.id,
             self._parent.token,
@@ -1035,6 +1053,9 @@ class InteractionResponse:
 
         parent = self._parent
         adapter = async_context.get()
+        if adapter is None:
+            raise ClientException("Adapter context is not available")
+
         try:
             await adapter.create_interaction_response(
                 parent.id,
@@ -1085,6 +1106,9 @@ class InteractionResponse:
 
         parent = self._parent
         adapter = async_context.get()
+        if adapter is None:
+            raise ClientException("Adapter context is not available")
+
         await adapter.create_interaction_response(
             parent.id,
             parent.token,
@@ -1202,6 +1226,9 @@ class InteractionResponse:
                 payload["components"] = view.to_components()
 
         adapter = async_context.get()
+        if adapter is None:
+            raise ClientException("Adapter context is not available")
+
         try:
             await adapter.create_interaction_response(
                 parent.id,
@@ -1420,7 +1447,8 @@ class PartialInteractionMessage(_InteractionMessageMixin):
 
     def __eq__(self, other: object) -> bool:
         return (
-            isinstance(other, PartialInteractionMessage) and self._interaction == other._interaction
+            isinstance(other, PartialInteractionMessage)
+            and self._interaction == other._interaction
         )
 
     def __ne__(self, other: object) -> bool:

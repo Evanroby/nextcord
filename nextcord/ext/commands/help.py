@@ -19,10 +19,10 @@ if TYPE_CHECKING:
     from .context import Context
 
 __all__ = (
-    "Paginator",
-    "HelpCommand",
     "DefaultHelpCommand",
+    "HelpCommand",
     "MinimalHelpCommand",
+    "Paginator",
 )
 
 # help -> shows info of bot on top/bottom and lists subcommands
@@ -852,7 +852,9 @@ class HelpCommand:
             try:
                 found = cmd.all_commands.get(key)
             except AttributeError:
-                string = await maybe_coro(self.subcommand_not_found, cmd, self.remove_mentions(key))
+                string = await maybe_coro(
+                    self.subcommand_not_found, cmd, self.remove_mentions(key)
+                )
                 return await self.send_error_message(string)
             else:
                 if found is None:

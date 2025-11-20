@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from ...types.components import ChannelSelectMenu as ChannelSelectMenuPayload
     from ...types.interactions import ComponentInteractionData
 
-__all__ = ("ChannelSelect", "channel_select", "ChannelSelectValues")
+__all__ = ("ChannelSelect", "ChannelSelectValues", "channel_select")
 
 V_co = TypeVar("V_co", bound="View", covariant=True)
 
@@ -151,7 +151,8 @@ def channel_select(
     row: Optional[int] = None,
     channel_types: List[ChannelType] = MISSING,
 ) -> Callable[
-    [ItemCallbackType[ChannelSelect[V_co], ClientT]], ItemCallbackType[ChannelSelect[V_co], ClientT]
+    [ItemCallbackType[ChannelSelect[V_co], ClientT]],
+    ItemCallbackType[ChannelSelect[V_co], ClientT],
 ]:
     """A decorator that attaches a channel select menu to a component.
 

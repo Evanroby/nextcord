@@ -10,8 +10,8 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
 __all__ = (
-    "Permissions",
     "PermissionOverwrite",
+    "Permissions",
 )
 
 
@@ -97,13 +97,17 @@ class Permissions(BaseFlags):
         """Returns ``True`` if self has the same or fewer permissions as other."""
         if isinstance(other, Permissions):
             return (self.value & other.value) == self.value
-        raise TypeError(f"cannot compare {self.__class__.__name__} with {other.__class__.__name__}")
+        raise TypeError(
+            f"cannot compare {self.__class__.__name__} with {other.__class__.__name__}"
+        )
 
     def is_superset(self, other: Permissions) -> bool:
         """Returns ``True`` if self has the same or more permissions as other."""
         if isinstance(other, Permissions):
             return (self.value | other.value) == self.value
-        raise TypeError(f"cannot compare {self.__class__.__name__} with {other.__class__.__name__}")
+        raise TypeError(
+            f"cannot compare {self.__class__.__name__} with {other.__class__.__name__}"
+        )
 
     def is_strict_subset(self, other: Permissions) -> bool:
         """Returns ``True`` if the permissions on other are a strict subset of those on self."""
@@ -708,6 +712,9 @@ class PermissionOverwrite:
         moderate_members: Optional[bool]
         create_expressions: Optional[bool]
         create_events: Optional[bool]
+
+    def __hash__(self):
+        return hash(frozenset(self._values.items()))
 
     def __init__(self, **kwargs: Optional[bool]) -> None:
         self._values: Dict[str, Optional[bool]] = {}

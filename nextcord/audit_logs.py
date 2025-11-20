@@ -147,7 +147,9 @@ def _transform_avatar(entry: AuditLogEntry, data: Optional[str]) -> Optional[Ass
     return Asset._from_avatar(entry._state, entry._target_id, data)  # type: ignore
 
 
-def _guild_hash_transformer(path: str) -> Callable[[AuditLogEntry, Optional[str]], Optional[Asset]]:
+def _guild_hash_transformer(
+    path: str,
+) -> Callable[[AuditLogEntry, Optional[str]], Optional[Asset]]:
     def _transform(entry: AuditLogEntry, data: Optional[str]) -> Optional[Asset]:
         if data is None:
             return None
@@ -167,14 +169,16 @@ def _enum_transformer(enum: Type[E]) -> Callable[[AuditLogEntry, int], E]:
     return _transform
 
 
-def _transform_type(entry: AuditLogEntry, data: int) -> Union[enums.ChannelType, enums.StickerType]:
+def _transform_type(
+    entry: AuditLogEntry, data: int
+) -> Union[enums.ChannelType, enums.StickerType]:
     if entry.action.name.startswith("sticker_"):
         return enums.try_enum(enums.StickerType, data)
     return enums.try_enum(enums.ChannelType, data)
 
 
 def _list_transformer(
-    func: Callable[[AuditLogEntry, Any], T]
+    func: Callable[[AuditLogEntry, Any], T],
 ) -> Callable[[AuditLogEntry, Any], List[T]]:
     def _transform(entry: AuditLogEntry, data: Any) -> List[T]:
         if not data:
@@ -519,7 +523,9 @@ class AuditLogEntry(Hashable):
 
         # this just gets automatically filled in if present, this way prevents crashes if channel_id is None
         if channel_id and self.action:
-            elems["channel"] = self.guild.get_channel_or_thread(channel_id) or Object(id=channel_id)
+            elems["channel"] = self.guild.get_channel_or_thread(channel_id) or Object(
+                id=channel_id
+            )
 
         if type(self.extra) is dict:  # type: ignore
             self.extra = type("_AuditLogProxy", (), elems)()  # type: ignore
@@ -597,7 +603,9 @@ class AuditLogEntry(Hashable):
     def _convert_target_invite(self, target_id: int) -> Invite:
         # invites have target_id set to null
         # so figure out which change has the full invite data
-        changeset = self.before if self.action is enums.AuditLogAction.invite_delete else self.after
+        changeset = (
+            self.before if self.action is enums.AuditLogAction.invite_delete else self.after
+        )
 
         fake_payload = {
             "max_age": changeset.max_age,

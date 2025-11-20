@@ -22,8 +22,10 @@ if TYPE_CHECKING:
 
     from .bot import AutoShardedBot, Bot
     from .cog import Cog
-    from .core import Command
+    from .core import Command, Group, wrap_callback
+    from .errors import CommandError
     from .view import StringView
+
 
 __all__ = ("Context",)
 
@@ -125,7 +127,9 @@ class Context(nextcord.abc.Messageable, Generic[BotT]):
         self.current_parameter: Optional[inspect.Parameter] = current_parameter
         self._state: ConnectionState = self.message._state
 
-    async def invoke(self, command: Command[CogT, P, T], /, *args: P.args, **kwargs: P.kwargs) -> T:
+    async def invoke(
+        self, command: Command[CogT, P, T], /, *args: P.args, **kwargs: P.kwargs
+    ) -> T:
         r"""|coro|
 
         Calls a command with the arguments given.
@@ -316,9 +320,6 @@ class Context(nextcord.abc.Messageable, Generic[BotT]):
         Any
             The result of the help command, if any.
         """
-        from .core import Command, Group, wrap_callback
-        from .errors import CommandError
-
         bot = self.bot
         cmd = bot.help_command
 

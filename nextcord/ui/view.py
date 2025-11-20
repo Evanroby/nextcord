@@ -33,7 +33,10 @@ from ..components import (
     TextInput as TextComponent,
     _component_factory,
 )
+from .button import Button
 from .item import Item, ItemCallbackType
+from .select import Select
+from .text_input import TextInput
 
 __all__ = ("View",)
 
@@ -56,16 +59,10 @@ def _walk_all_components(components: List[Component]) -> Iterator[Component]:
 
 def _component_to_item(component: Component) -> Item:
     if isinstance(component, ButtonComponent):
-        from .button import Button
-
         return Button.from_component(component)
     if isinstance(component, SelectComponent):
-        from .select import Select
-
         return Select.from_component(component)
     if isinstance(component, TextComponent):
-        from .text_input import TextInput
-
         return TextInput.from_component(component)
     return Item.from_component(component)
 

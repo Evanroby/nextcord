@@ -17,9 +17,9 @@ if TYPE_CHECKING:
     from .types.widget import Widget as WidgetPayload, WidgetMember as WidgetMemberPayload
 
 __all__ = (
+    "Widget",
     "WidgetChannel",
     "WidgetMember",
-    "Widget",
 )
 
 
@@ -128,14 +128,14 @@ class WidgetMember(BaseUser):
     """
 
     __slots__ = (
-        "status",
-        "nick",
-        "avatar",
         "activity",
-        "deafened",
-        "suppress",
-        "muted",
+        "avatar",
         "connected_channel",
+        "deafened",
+        "muted",
+        "nick",
+        "status",
+        "suppress",
     )
 
     if TYPE_CHECKING:
@@ -214,7 +214,10 @@ class Widget:
 
     """
 
-    __slots__ = ("_state", "channels", "_invite", "id", "members", "name")
+    __slots__ = ("_invite", "_state", "channels", "id", "members", "name")
+
+    def __hash__(self) -> int:
+        return hash(self.id)
 
     def __init__(self, *, state: ConnectionState, data: WidgetPayload) -> None:
         self._state = state
@@ -238,7 +241,9 @@ class Widget:
             elif connected_channel:
                 connected_channel = WidgetChannel(id=connected_channel, name="", position=0)
 
-            self.members.append(WidgetMember(state=self._state, data=member, connected_channel=connected_channel))  # type: ignore
+            self.members.append(
+                WidgetMember(state=self._state, data=member, connected_channel=connected_channel)
+            )
 
     def __str__(self) -> str:
         return self.json_url

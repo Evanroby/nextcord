@@ -42,6 +42,7 @@ from typing import (
     get_args,
     overload,
 )
+from urllib.parse import urlencode
 
 from .enums import IntegrationType
 from .errors import InvalidArgument
@@ -72,23 +73,23 @@ if TYPE_CHECKING:
 
 
 __all__ = (
-    "oauth_url",
-    "snowflake_time",
-    "time_snowflake",
-    "find",
-    "get",
-    "sleep_until",
-    "utcnow",
-    "remove_markdown",
+    "as_chunks",
+    "cached_property",
     "escape_markdown",
     "escape_mentions",
-    "parse_raw_mentions",
-    "parse_raw_role_mentions",
-    "parse_raw_channel_mentions",
-    "as_chunks",
+    "find",
     "format_dt",
     "format_ts",
-    "cached_property",
+    "get",
+    "oauth_url",
+    "parse_raw_channel_mentions",
+    "parse_raw_mentions",
+    "parse_raw_role_mentions",
+    "remove_markdown",
+    "sleep_until",
+    "snowflake_time",
+    "time_snowflake",
+    "utcnow",
 )
 
 DISCORD_EPOCH = 1420070400000
@@ -321,8 +322,6 @@ def oauth_url(
     if guild is not MISSING:
         url += f"&guild_id={guild.id}"
     if redirect_uri is not MISSING:
-        from urllib.parse import urlencode
-
         url += "&response_type=code&" + urlencode({"redirect_uri": redirect_uri})
     if disable_guild_select:
         url += "&disable_guild_select=true"
@@ -491,7 +490,7 @@ def get_as_snowflake(data: Any, key: str) -> Optional[int]:
 
 
 def _get_mime_type_for_image(data: bytes) -> str:
-    if data.startswith(b"\x89\x50\x4E\x47\x0D\x0A\x1A\x0A"):
+    if data.startswith(b"\x89\x50\x4e\x47\x0d\x0a\x1a\x0a"):
         return "image/png"
     if data[0:3] == b"\xff\xd8\xff" or data[6:10] in (b"JFIF", b"Exif"):
         return "image/jpeg"
@@ -510,7 +509,9 @@ def _bytes_to_base64_data(data: bytes) -> str:
     return fmt.format(mime=mime, data=b64)
 
 
-async def obj_to_base64_data(obj: Optional[Union[bytes, Attachment, Asset, File]]) -> Optional[str]:
+async def obj_to_base64_data(
+    obj: Optional[Union[bytes, Attachment, Asset, File]],
+) -> Optional[str]:
     if obj is None:
         return obj
     if isinstance(obj, bytes):
@@ -683,7 +684,6 @@ def resolve_invite(invite: Union[Invite, str]) -> str:
     :class:`str`
         The invite code.
     """
-    from .invite import Invite  # circular import
 
     if isinstance(invite, Invite):
         if not invite.code:
@@ -715,7 +715,6 @@ def resolve_template(code: Union[Template, str]) -> str:
     :class:`str`
         The template code.
     """
-    from .template import Template  # circular import
 
     if isinstance(code, Template):
         return code.code

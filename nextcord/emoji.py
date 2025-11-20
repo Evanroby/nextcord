@@ -80,17 +80,17 @@ class Emoji(_EmojiTag, AssetMixin):
     """
 
     __slots__: Tuple[str, ...] = (
-        "require_colons",
-        "animated",
-        "managed",
-        "id",
-        "name",
         "_roles",
-        "guild_id",
         "_state",
-        "user",
-        "available",
+        "animated",
         "application_id",
+        "available",
+        "guild_id",
+        "id",
+        "managed",
+        "name",
+        "require_colons",
+        "user",
     )
 
     def __init__(
@@ -227,7 +227,11 @@ class Emoji(_EmojiTag, AssetMixin):
             await self._state.http.delete_custom_emoji(self.guild.id, self.id, reason=reason)
 
     async def edit(
-        self, *, name: str = MISSING, roles: List[Snowflake] = MISSING, reason: Optional[str] = None
+        self,
+        *,
+        name: str = MISSING,
+        roles: List[Snowflake] = MISSING,
+        reason: Optional[str] = None,
     ) -> Emoji:
         r"""|coro|
 

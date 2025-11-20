@@ -263,52 +263,52 @@ class Guild(Hashable):
     """
 
     __slots__ = (
-        "afk_timeout",
-        "afk_channel",
-        "name",
-        "id",
-        "unavailable",
-        "region",
-        "owner_id",
-        "mfa_level",
-        "emojis",
-        "stickers",
-        "features",
-        "verification_level",
-        "explicit_content_filter",
-        "default_notifications",
-        "description",
-        "max_presences",
-        "max_members",
-        "max_video_channel_users",
-        "premium_tier",
-        "premium_subscription_count",
-        "preferred_locale",
-        "nsfw_level",
         "_application_commands",
-        "_members",
-        "_channels",
-        "_icon",
         "_banner",
-        "_state",
-        "_roles",
-        "_member_count",
-        "_large",
-        "_splash",
-        "_voice_states",
-        "_system_channel_id",
-        "_system_channel_flags",
+        "_channels",
         "_discovery_splash",
-        "_rules_channel_id",
+        "_icon",
+        "_large",
+        "_member_count",
+        "_members",
+        "_premium_progress_bar_enabled",
         "_public_updates_channel_id",
-        "_stage_instances",
-        "_threads",
+        "_roles",
+        "_rules_channel_id",
+        "_safety_alerts_channel_id",
         "_scheduled_events",
+        "_splash",
+        "_stage_instances",
+        "_state",
+        "_system_channel_flags",
+        "_system_channel_id",
+        "_threads",
+        "_voice_states",
+        "afk_channel",
+        "afk_timeout",
         "approximate_member_count",
         "approximate_presence_count",
-        "_premium_progress_bar_enabled",
-        "_safety_alerts_channel_id",
+        "default_notifications",
+        "description",
+        "emojis",
+        "explicit_content_filter",
+        "features",
+        "id",
+        "max_members",
+        "max_presences",
         "max_stage_video_channel_users",
+        "max_video_channel_users",
+        "mfa_level",
+        "name",
+        "nsfw_level",
+        "owner_id",
+        "preferred_locale",
+        "premium_subscription_count",
+        "premium_tier",
+        "region",
+        "stickers",
+        "unavailable",
+        "verification_level",
     )
 
     _PREMIUM_GUILD_LIMITS: ClassVar[Dict[Optional[int], _GuildLimit]] = {
@@ -1505,7 +1505,11 @@ class Guild(Hashable):
             options["position"] = position
 
         data = await self._create_channel(
-            name, overwrites=overwrites, channel_type=ChannelType.category, reason=reason, **options
+            name,
+            overwrites=overwrites,
+            channel_type=ChannelType.category,
+            reason=reason,
+            **options,
         )
         channel = CategoryChannel(state=self._state, guild=self, data=data)  # type: ignore
         # payload *should* contain all category channel info
@@ -1893,7 +1897,9 @@ class Guild(Hashable):
 
         if explicit_content_filter is not MISSING:
             if not isinstance(explicit_content_filter, ContentFilter):
-                raise InvalidArgument("explicit_content_filter field must be of type ContentFilter")
+                raise InvalidArgument(
+                    "explicit_content_filter field must be of type ContentFilter"
+                )
 
             fields["explicit_content_filter"] = explicit_content_filter.value
 
@@ -2299,7 +2305,6 @@ class Guild(Hashable):
         List[:class:`Template`]
             The templates for this guild.
         """
-        from .template import Template
 
         data = await self._state.http.guild_templates(self.id)
         return [Template(data=d, state=self._state) for d in data]
@@ -2321,8 +2326,6 @@ class Guild(Hashable):
         List[:class:`Webhook`]
             The webhooks for this guild.
         """
-
-        from .webhook import Webhook
 
         data = await self._state.http.guild_webhooks(self.id)
         return [Webhook.from_state(d, state=self._state) for d in data]
@@ -2423,7 +2426,6 @@ class Guild(Hashable):
         description: :class:`str`
             The description of the template.
         """
-        from .template import Template
 
         payload: CreateTemplate = {"name": name, "icon": None}
 
@@ -3284,7 +3286,7 @@ class Guild(Hashable):
             oldest_first=oldest_first,
             user_id=user_id,
             action_type=action,
-        )
+        ).__aiter__()
 
     async def widget(self) -> Widget:
         """|coro|

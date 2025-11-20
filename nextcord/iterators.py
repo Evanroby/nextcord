@@ -13,13 +13,13 @@ from .object import Object
 from .utils import snowflake_time, time_snowflake
 
 __all__ = (
-    "reaction_iterator",
-    "history_iterator",
-    "ban_iterator",
-    "audit_log_iterator",
-    "guild_iterator",
-    "member_iterator",
     "archived_thread_iterator",
+    "audit_log_iterator",
+    "ban_iterator",
+    "guild_iterator",
+    "history_iterator",
+    "member_iterator",
+    "reaction_iterator",
     "scheduled_event_iterator",
     "scheduled_event_user_iterator",
 )
@@ -32,6 +32,7 @@ if TYPE_CHECKING:
     from .member import Member
     from .message import Message
     from .scheduled_events import ScheduledEvent
+    from .threads import Thread
     from .types.audit_log import AuditLog as AuditLogPayload
     from .types.guild import Ban as BanPayload, Guild as GuildPayload
     from .types.member import MemberWithUser
@@ -41,6 +42,7 @@ if TYPE_CHECKING:
         ScheduledEventUser as ScheduledEventUserPayload,
     )
     from .types.threads import Thread as ThreadPayload, ThreadPaginationPayload
+    from .user import User
 
 
 OLDEST_OBJECT = Object(id=0)
@@ -49,8 +51,6 @@ OLDEST_OBJECT = Object(id=0)
 async def reaction_iterator(
     message: Message, emoji: str, limit: int = 100, after: Optional[Snowflake] = None
 ):
-    from .user import User
-
     state = message._state
 
     while limit > 0:
@@ -378,7 +378,6 @@ async def guild_iterator(
     after: Optional[Union[:class:`abc.Snowflake`, :class:`datetime.datetime`]]
         Object after which all guilds must be.
     """
-    from .guild import Guild
 
     if isinstance(before, datetime.datetime):
         before = Object(id=time_snowflake(before, high=False))
@@ -438,8 +437,6 @@ async def member_iterator(
     limit: Optional[int] = 1000,
     after: Optional[Union[Snowflake, datetime.datetime]] = None,
 ):
-    from .member import Member
-
     if isinstance(after, datetime.datetime):
         after = Object(id=time_snowflake(after, high=True))
 
@@ -473,8 +470,6 @@ async def archived_thread_iterator(
     private: bool,
     before: Optional[Union[Snowflake, datetime.datetime]] = None,
 ):
-    from .threads import Thread
-
     state = guild._state
     has_more = True
 

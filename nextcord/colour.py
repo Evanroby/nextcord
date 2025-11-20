@@ -10,8 +10,8 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
 __all__ = (
-    "Colour",
     "Color",
+    "Colour",
 )
 
 CT = TypeVar("CT", bound="Colour")
@@ -55,7 +55,9 @@ class Colour:
 
     def __init__(self, value: int) -> None:
         if not isinstance(value, int):
-            raise TypeError(f"Expected int parameter, received {value.__class__.__name__} instead.")
+            raise TypeError(
+                f"Expected int parameter, received {value.__class__.__name__} instead."
+            )
 
         self.value: int = value
 

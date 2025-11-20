@@ -37,31 +37,31 @@ if TYPE_CHECKING:
 
 
 __all__ = (
-    "Converter",
-    "ObjectConverter",
-    "MemberConverter",
-    "UserConverter",
-    "MessageConverter",
-    "PartialMessageConverter",
-    "TextChannelConverter",
-    "InviteConverter",
-    "GuildConverter",
-    "RoleConverter",
-    "GameConverter",
-    "ColourConverter",
-    "ColorConverter",
-    "VoiceChannelConverter",
-    "StageChannelConverter",
-    "EmojiConverter",
-    "PartialEmojiConverter",
     "CategoryChannelConverter",
-    "IDConverter",
-    "ThreadConverter",
-    "GuildChannelConverter",
-    "GuildStickerConverter",
-    "ScheduledEventConverter",
-    "clean_content",
+    "ColorConverter",
+    "ColourConverter",
+    "Converter",
+    "EmojiConverter",
+    "GameConverter",
     "Greedy",
+    "GuildChannelConverter",
+    "GuildConverter",
+    "GuildStickerConverter",
+    "IDConverter",
+    "InviteConverter",
+    "MemberConverter",
+    "MessageConverter",
+    "ObjectConverter",
+    "PartialEmojiConverter",
+    "PartialMessageConverter",
+    "RoleConverter",
+    "ScheduledEventConverter",
+    "StageChannelConverter",
+    "TextChannelConverter",
+    "ThreadConverter",
+    "UserConverter",
+    "VoiceChannelConverter",
+    "clean_content",
     "run_converters",
 )
 
@@ -968,7 +968,9 @@ class clean_content(Converter[str]):
                 m = _utils_get(msg.mentions, id=id) or ctx.guild.get_member(id)  # type: ignore
                 # [in a guild if we are here]
                 return (
-                    f"@{m.display_name if self.use_nicknames else m.name}" if m else "@deleted-user"
+                    f"@{m.display_name if self.use_nicknames else m.name}"
+                    if m
+                    else "@deleted-user"
                 )
 
             def resolve_role(id: int) -> str:  # pyright: ignore[reportRedeclaration]
@@ -1091,7 +1093,7 @@ def get_converter(param: inspect.Parameter) -> Any:
 
 
 def is_generic_type(tp: Any) -> bool:
-    return isinstance(tp, type) and issubclass(tp, Generic) or isinstance(tp, GenericAlias)
+    return (isinstance(tp, type) and issubclass(tp, Generic)) or isinstance(tp, GenericAlias)
 
 
 CONVERTER_MAPPING: Dict[Type[Any], Any] = {
@@ -1118,7 +1120,9 @@ CONVERTER_MAPPING: Dict[Type[Any], Any] = {
 }
 
 
-async def _actual_conversion(ctx: Context, converter: Any, argument: str, param: inspect.Parameter):
+async def _actual_conversion(
+    ctx: Context, converter: Any, argument: str, param: inspect.Parameter
+):
     if converter is bool:
         return _convert_to_bool(argument)
 
@@ -1148,7 +1152,7 @@ async def _actual_conversion(ctx: Context, converter: Any, argument: str, param:
     try:
         # pyright believes this to be Any | type[object], which is fine anyway
         # but claims 0 positional arguments
-        return converter(argument)  # pyright: ignore
+        return converter(argument)
     except CommandError:
         raise
     except Exception as exc:

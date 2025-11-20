@@ -50,7 +50,7 @@ class EventType:
 
 
 class EventItem:
-    __slots__ = ("type", "shard", "error")
+    __slots__ = ("error", "shard", "type")
 
     def __init__(self, etype: int, shard: Optional["Shard"], error: Optional[Exception]) -> None:
         self.type: int = etype
@@ -530,7 +530,8 @@ class AutoShardedClient(Client):
                 await vc.disconnect(force=True)
 
         to_close = [
-            asyncio.ensure_future(shard.close(), loop=self.loop) for shard in self.__shards.values()
+            asyncio.ensure_future(shard.close(), loop=self.loop)
+            for shard in self.__shards.values()
         ]
         if to_close:
             await asyncio.wait(to_close)
@@ -598,8 +599,6 @@ class AutoShardedClient(Client):
         activities = () if activity is None else (activity,)
         for guild in guilds:
             me = guild.me
-            if me is None:
-                continue
 
             # Member.activities is typehinted as Tuple[ActivityType, ...], we may be setting it as Tuple[BaseActivity, ...]
             me.activities = activities  # type: ignore

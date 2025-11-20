@@ -49,15 +49,15 @@ from .threads import Thread
 from .utils import MISSING
 
 __all__ = (
-    "TextChannel",
-    "VoiceChannel",
-    "StageChannel",
-    "DMChannel",
     "CategoryChannel",
-    "GroupChannel",
-    "PartialMessageable",
+    "DMChannel",
     "ForumChannel",
     "ForumTag",
+    "GroupChannel",
+    "PartialMessageable",
+    "StageChannel",
+    "TextChannel",
+    "VoiceChannel",
 )
 
 if TYPE_CHECKING:
@@ -159,21 +159,21 @@ class TextChannel(abc.Messageable, abc.GuildChannel, Hashable, PinsMixin):
     """
 
     __slots__ = (
-        "name",
-        "id",
-        "guild",
-        "topic",
+        "_overwrites",
         "_state",
-        "nsfw",
+        "_type",
         "category_id",
+        "default_auto_archive_duration",
+        "default_thread_slowmode_delay",
+        "flags",
+        "guild",
+        "id",
+        "last_message_id",
+        "name",
+        "nsfw",
         "position",
         "slowmode_delay",
-        "_overwrites",
-        "_type",
-        "last_message_id",
-        "default_auto_archive_duration",
-        "flags",
-        "default_thread_slowmode_delay",
+        "topic",
     )
 
     def __init__(self, *, state: ConnectionState, guild: Guild, data: TextChannelPayload) -> None:
@@ -565,8 +565,6 @@ class TextChannel(abc.Messageable, abc.GuildChannel, Hashable, PinsMixin):
             The webhooks for this channel.
         """
 
-        from .webhook import Webhook
-
         data = await self._state.http.channel_webhooks(self.id)
         return [Webhook.from_state(d, state=self._state) for d in data]
 
@@ -612,8 +610,6 @@ class TextChannel(abc.Messageable, abc.GuildChannel, Hashable, PinsMixin):
         :class:`Webhook`
             The created webhook.
         """
-
-        from .webhook import Webhook
 
         avatar_base64 = await utils.obj_to_base64_data(avatar)
 
@@ -661,10 +657,9 @@ class TextChannel(abc.Messageable, abc.GuildChannel, Hashable, PinsMixin):
             raise ClientException("The channel must be a news channel.")
 
         if not isinstance(destination, TextChannel):
-            raise InvalidArgument(f"Expected TextChannel received {destination.__class__.__name__}")
-
-        from .webhook import Webhook
-
+            raise InvalidArgument(
+                f"Expected TextChannel received {destination.__class__.__name__}"
+            )
         data = await self._state.http.follow_webhook(
             self.id, webhook_channel_id=destination.id, reason=reason
         )
@@ -688,8 +683,6 @@ class TextChannel(abc.Messageable, abc.GuildChannel, Hashable, PinsMixin):
         :class:`PartialMessage`
             The partial message.
         """
-
-        from .message import PartialMessage
 
         return PartialMessage(channel=self, id=message_id)
 
@@ -911,25 +904,25 @@ class ForumChannel(abc.GuildChannel, Hashable):
     """
 
     __slots__ = (
-        "id",
-        "guild",
-        "name",
-        "category_id",
-        "position",
-        "topic",
-        "nsfw",
-        "flags",
-        "slowmode_delay",
-        "default_auto_archive_duration",
-        "last_message_id",
-        "default_sort_order",
-        "default_forum_layout",
+        "_available_tags",
+        "_overwrites",
         "_state",
         "_type",
-        "_overwrites",
-        "default_thread_slowmode_delay",
-        "_available_tags",
+        "category_id",
+        "default_auto_archive_duration",
+        "default_forum_layout",
         "default_reaction",
+        "default_sort_order",
+        "default_thread_slowmode_delay",
+        "flags",
+        "guild",
+        "id",
+        "last_message_id",
+        "name",
+        "nsfw",
+        "position",
+        "slowmode_delay",
+        "topic",
     )
 
     def __init__(self, *, state: ConnectionState, guild: Guild, data: ForumChannelPayload) -> None:
@@ -1466,8 +1459,6 @@ class ForumChannel(abc.GuildChannel, Hashable):
             The created webhook.
         """
 
-        from .webhook import Webhook
-
         avatar_base64 = await utils.obj_to_base64_data(avatar)
 
         data = await self._state.http.create_webhook(
@@ -1495,26 +1486,24 @@ class ForumChannel(abc.GuildChannel, Hashable):
             The webhooks for this channel.
         """
 
-        from .webhook import Webhook
-
         data = await self._state.http.channel_webhooks(self.id)
         return [Webhook.from_state(d, state=self._state) for d in data]
 
 
 class VocalGuildChannel(abc.Connectable, abc.GuildChannel, Hashable):
     __slots__ = (
-        "name",
-        "id",
-        "guild",
-        "bitrate",
-        "user_limit",
-        "_state",
-        "position",
         "_overwrites",
+        "_state",
+        "bitrate",
         "category_id",
-        "rtc_region",
-        "video_quality_mode",
         "flags",
+        "guild",
+        "id",
+        "name",
+        "position",
+        "rtc_region",
+        "user_limit",
+        "video_quality_mode",
     )
 
     def __init__(
@@ -2029,8 +2018,6 @@ class VoiceChannel(VocalGuildChannel, abc.Messageable):
             The created webhook.
         """
 
-        from .webhook import Webhook
-
         avatar_base64 = await utils.obj_to_base64_data(avatar)
 
         data = await self._state.http.create_webhook(
@@ -2057,8 +2044,6 @@ class VoiceChannel(VocalGuildChannel, abc.Messageable):
         List[:class:`Webhook`]
             The webhooks for this channel.
         """
-
-        from .webhook import Webhook
 
         data = await self._state.http.channel_webhooks(self.id)
         return [Webhook.from_state(d, state=self._state) for d in data]
@@ -2128,7 +2113,7 @@ class StageChannel(VocalGuildChannel, abc.Messageable):
             consider :meth:`is_nsfw` instead.
     """
 
-    __slots__ = ("topic", "nsfw")
+    __slots__ = ("nsfw", "topic")
 
     def __repr__(self) -> str:
         attrs = [
@@ -2411,9 +2396,6 @@ class StageChannel(VocalGuildChannel, abc.Messageable):
         List[:class:`Webhook`]
             The webhooks for this channel.
         """
-
-        from .webhook import Webhook
-
         data = await self._state.http.channel_webhooks(self.id)
         return [Webhook.from_state(d, state=self._state) for d in data]
 
@@ -2465,15 +2447,15 @@ class CategoryChannel(abc.GuildChannel, Hashable):
     """
 
     __slots__ = (
-        "name",
-        "id",
-        "guild",
-        "nsfw",
-        "_state",
-        "position",
         "_overwrites",
+        "_state",
         "category_id",
         "flags",
+        "guild",
+        "id",
+        "name",
+        "nsfw",
+        "position",
     )
 
     def __init__(
@@ -2724,7 +2706,7 @@ class DMChannel(abc.Messageable, abc.PrivateChannel, Hashable, PinsMixin):
         The direct message channel ID.
     """
 
-    __slots__ = ("id", "recipient", "me", "_state")
+    __slots__ = ("_state", "id", "me", "recipient")
 
     def __init__(self, *, me: ClientUser, state: ConnectionState, data: DMChannelPayload) -> None:
         self._state: ConnectionState = state
@@ -2812,8 +2794,6 @@ class DMChannel(abc.Messageable, abc.PrivateChannel, Hashable, PinsMixin):
             The partial message.
         """
 
-        from .message import PartialMessage
-
         return PartialMessage(channel=self, id=message_id)
 
 
@@ -2856,7 +2836,7 @@ class GroupChannel(abc.Messageable, abc.PrivateChannel, Hashable, PinsMixin):
         The group channel's name if provided.
     """
 
-    __slots__ = ("id", "recipients", "owner_id", "owner", "_icon", "name", "me", "_state")
+    __slots__ = ("_icon", "_state", "id", "me", "name", "owner", "owner_id", "recipients")
 
     def __init__(
         self, *, me: ClientUser, state: ConnectionState, data: GroupChannelPayload
@@ -2996,7 +2976,9 @@ class PartialMessageable(abc.Messageable, Hashable):
         The channel type associated with this partial messageable, if given.
     """
 
-    def __init__(self, state: ConnectionState, id: int, type: Optional[ChannelType] = None) -> None:
+    def __init__(
+        self, state: ConnectionState, id: int, type: Optional[ChannelType] = None
+    ) -> None:
         self._state: ConnectionState = state
         self._channel: Object = Object(id=id)
         self.id: int = id
@@ -3021,8 +3003,6 @@ class PartialMessageable(abc.Messageable, Hashable):
         :class:`PartialMessage`
             The partial message.
         """
-
-        from .message import PartialMessage
 
         return PartialMessage(channel=self, id=message_id)
 
@@ -3103,7 +3083,7 @@ class ForumTag:
         The emoji that represents this tag.
     """
 
-    __slots__ = ("id", "name", "moderated", "emoji")
+    __slots__ = ("emoji", "id", "moderated", "name")
 
     def __init__(
         self,

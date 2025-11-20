@@ -54,11 +54,11 @@ if TYPE_CHECKING:
     from ._types import Check, CoroFunc
 
 __all__ = (
+    "AutoShardedBot",
+    "Bot",
+    "MissingMessageContentIntentWarning",
     "when_mentioned",
     "when_mentioned_or",
-    "Bot",
-    "AutoShardedBot",
-    "MissingMessageContentIntentWarning",
 )
 
 MISSING: Any = nextcord.utils.MISSING
@@ -77,7 +77,9 @@ def when_mentioned(bot: Union[Bot, AutoShardedBot], _msg: Message) -> List[str]:
     return [f"<@{bot.user.id}> ", f"<@!{bot.user.id}> "]  # type: ignore
 
 
-def when_mentioned_or(*prefixes: str) -> Callable[[Union[Bot, AutoShardedBot], Message], List[str]]:
+def when_mentioned_or(
+    *prefixes: str,
+) -> Callable[[Union[Bot, AutoShardedBot], Message], List[str]]:
     """A callable that implements when mentioned or other prefixes provided.
 
     These are meant to be passed into the :attr:`.Bot.command_prefix` attribute.
@@ -666,7 +668,9 @@ class BotBase(GroupMixin):
             if not has_kwargs:
                 raise errors.InvalidSetupArguments(key)
             if not isinstance(extras, dict):
-                raise errors.ExtensionFailed(key, TypeError("Expected 'extras' to be a dictionary"))
+                raise errors.ExtensionFailed(
+                    key, TypeError("Expected 'extras' to be a dictionary")
+                )
 
         extras = extras or {}
         try:
@@ -1062,7 +1066,11 @@ class BotBase(GroupMixin):
         return loaded_extensions
 
     def load_extensions_from_module(
-        self, source_module: str, *, ignore: Optional[List[str]] = None, stop_at_error: bool = False
+        self,
+        source_module: str,
+        *,
+        ignore: Optional[List[str]] = None,
+        stop_at_error: bool = False,
     ) -> List[str]:
         """Loads all extensions found in a module.
 
@@ -1119,7 +1127,11 @@ class BotBase(GroupMixin):
 
         for submodule_path in submodule_paths:
             submodules = [
-                (f"{name}.{submodule[:-3]}" if submodule.endswith(".py") else f"{name}.{submodule}")
+                (
+                    f"{name}.{submodule[:-3]}"
+                    if submodule.endswith(".py")
+                    else f"{name}.{submodule}"
+                )
                 for submodule in os.listdir(submodule_path)
                 if not submodule.startswith("_")
             ]

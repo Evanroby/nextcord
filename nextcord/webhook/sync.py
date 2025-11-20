@@ -19,6 +19,8 @@ from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Tuple, Typ
 from urllib.parse import quote as urlquote
 from weakref import WeakValueDictionary
 
+import requests
+
 from .. import utils
 from ..channel import PartialMessageable
 from ..errors import DiscordServerError, Forbidden, HTTPException, InvalidArgument, NotFound
@@ -586,8 +588,6 @@ class SyncWebhook(BaseWebhook):
             "type": 1,
             "token": token,
         }
-        import requests
-
         if session is not MISSING:
             if not isinstance(session, requests.Session):
                 raise TypeError(f"Expected requests.Session not {session.__class__!r}")
@@ -634,7 +634,6 @@ class SyncWebhook(BaseWebhook):
 
         data: Dict[str, Any] = m.groupdict()
         data["type"] = 1
-        import requests
 
         if session is not MISSING:
             if not isinstance(session, requests.Session):

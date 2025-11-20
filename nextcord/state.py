@@ -2161,12 +2161,11 @@ class ConnectionState:
         self.dispatch("raw_typing", raw)
 
         channel, guild = self._get_guild_channel(data)
-        if channel is not None:
-            user = raw.member or self._get_typing_user(channel, raw.user_id)  # type: ignore
-            # will be messageable channel if we get here
+        user = raw.member or self._get_typing_user(channel, raw.user_id)  # type: ignore
+        # will be messageable channel if we get here
 
-            if user is not None:
-                self.dispatch("typing", channel, user, raw.when)
+        if user is not None:
+            self.dispatch("typing", channel, user, raw.when)
 
     def _get_typing_user(
         self, channel: Optional[MessageableChannel], user_id: int

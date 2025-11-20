@@ -20,6 +20,9 @@ class EqualityComparable:
 
     id: int
 
+    def __hash__(self):
+        return self.id >> 22
+
     def __eq__(self, other: object) -> bool:
         return isinstance(other, self.__class__) and other.id == self.id
 

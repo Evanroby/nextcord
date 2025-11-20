@@ -33,10 +33,10 @@ _log = logging.getLogger(__name__)
 
 __all__ = (
     "AudioSource",
-    "PCMAudio",
     "FFmpegAudio",
-    "FFmpegPCMAudio",
     "FFmpegOpusAudio",
+    "FFmpegPCMAudio",
+    "PCMAudio",
     "PCMVolumeTransformer",
 )
 
@@ -548,7 +548,9 @@ class FFmpegOpusAudio(FFmpegAudio):
         codec = bitrate = None
         loop = asyncio.get_event_loop()
         try:
-            codec, bitrate = await loop.run_in_executor(None, lambda: probefunc(source, executable))
+            codec, bitrate = await loop.run_in_executor(
+                None, lambda: probefunc(source, executable)
+            )
         except Exception:
             if not fallback:
                 _log.exception("Probe '%s' using '%s' failed", method, executable)

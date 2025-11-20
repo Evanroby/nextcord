@@ -82,7 +82,7 @@ if TYPE_CHECKING:
     from .abc import GuildChannel, PrivateChannel, Snowflake, SnowflakeTime
     from .application_command import ClientCog, SlashApplicationSubcommand
     from .asset import Asset
-    from .channel import DMChannel
+    from .channel import DMChannel, StageChannel
     from .enums import IntegrationType, InteractionContextType, Locale
     from .file import File
     from .flags import MemberCacheFlags
@@ -637,7 +637,9 @@ class Client:
         # toes of those who need to override their own hook.
         await self.before_identify_hook(shard_id, initial=initial)
 
-    async def before_identify_hook(self, shard_id: Optional[int], *, initial: bool = False) -> None:
+    async def before_identify_hook(
+        self, shard_id: Optional[int], *, initial: bool = False
+    ) -> None:
         """|coro|
 
         A hook that is called before IDENTIFYing a session. This is useful
@@ -1035,8 +1037,6 @@ class Client:
         Optional[:class:`.StageInstance`]
             The returns stage instance of ``None`` if not found.
         """
-        from .channel import StageChannel
-
         channel = self._connection.get_channel(id)
 
         if isinstance(channel, StageChannel):
@@ -1446,14 +1446,13 @@ class Client:
             status_str = str(status)
 
         await self.ws.change_presence(activity=activity, status=status_str)
-
         for guild in self._connection.guilds:
-            me = guild.me
+            me = getattr(guild, "me", None)
             if me is None:
                 continue
 
             if activity is not None:
-                me.activities = (activity,)  # type: ignore
+                me.activities = (activity,)
             else:
                 me.activities = ()
 
@@ -2540,7 +2539,9 @@ class Client:
         )
 
     async def register_new_application_commands(
-        self, data: Optional[List[ApplicationCommandPayload]] = None, guild_id: Optional[int] = None
+        self,
+        data: Optional[List[ApplicationCommandPayload]] = None,
+        guild_id: Optional[int] = None,
     ) -> None:
         """|coro|
         Registers locally added application commands that don't match a signature that Discord has registered for

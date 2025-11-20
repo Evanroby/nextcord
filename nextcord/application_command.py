@@ -90,26 +90,26 @@ else:
     UnionType = None
 
 __all__ = (
-    "CallbackWrapper",
     "ApplicationCommandOption",
-    "BaseCommandOption",
-    "OptionConverter",
-    "ClientCog",
-    "CallbackMixin",
-    "SlashOption",
-    "SlashCommandOption",
     "BaseApplicationCommand",
-    "SlashApplicationSubcommand",
-    "SlashApplicationCommand",
-    "UserApplicationCommand",
-    "MessageApplicationCommand",
-    "slash_command",
-    "message_command",
-    "user_command",
+    "BaseCommandOption",
+    "CallbackMixin",
+    "CallbackWrapper",
+    "ClientCog",
     "Mentionable",
-    "Range",
-    "String",
+    "MessageApplicationCommand",
     "MissingApplicationCommandParametersWarning",
+    "OptionConverter",
+    "Range",
+    "SlashApplicationCommand",
+    "SlashApplicationSubcommand",
+    "SlashCommandOption",
+    "SlashOption",
+    "String",
+    "UserApplicationCommand",
+    "message_command",
+    "slash_command",
+    "user_command",
 )
 
 _log = logging.getLogger(__name__)
@@ -965,7 +965,9 @@ class CallbackMixin:
             if (before_invoke := self.cog_before_invoke) is not None:
                 await self._invoke_hook_param_check(before_invoke, interaction)
 
-            if (before_invoke := interaction.client._application_command_before_invoke) is not None:
+            if (
+                before_invoke := interaction.client._application_command_before_invoke
+            ) is not None:
                 await self._invoke_hook_param_check(before_invoke, interaction)
 
             try:
@@ -1579,9 +1581,9 @@ class SlashCommandOption(BaseCommandOption, SlashOption, AutocompleteOptionMixin
                             f"{self.error_name} | Annotation {anno} is incompatible with {found_type} \n| {typehint_origin}\n| {parameter.annotation}\n| {grouped_annotations}"
                         )
 
-                    if not (isinstance(anno, (ApplicationCommandOptionType, OptionConverter))) and (
-                        channel_types := self.channel_mapping.get(anno)
-                    ):
+                    if not (
+                        isinstance(anno, (ApplicationCommandOptionType, OptionConverter))
+                    ) and (channel_types := self.channel_mapping.get(anno)):
                         found_channel_types.extend(channel_types)
 
             annotation_type = found_type
@@ -2308,7 +2310,9 @@ class BaseApplicationCommand(CallbackMixin, CallbackWrapperMixin):
             "name": str(
                 self.name
             ),  # Might as well stringify the name, will come in handy if people try using numbers.
-            "description": str(self.description),  # Might as well do the same with the description.
+            "description": str(
+                self.description
+            ),  # Might as well do the same with the description.
             "name_localizations": self.get_name_localization_payload(),
             "description_localizations": self.get_description_localization_payload(),
         }
@@ -2637,7 +2641,9 @@ class BaseApplicationCommand(CallbackMixin, CallbackWrapperMixin):
         raise NotImplementedError
 
 
-class SlashApplicationSubcommand(SlashCommandMixin, AutocompleteCommandMixin, CallbackWrapperMixin):
+class SlashApplicationSubcommand(
+    SlashCommandMixin, AutocompleteCommandMixin, CallbackWrapperMixin
+):
     """Class representing a subcommand or subcommand group of a slash command."""
 
     def __init__(
@@ -2769,7 +2775,9 @@ class SlashApplicationSubcommand(SlashCommandMixin, AutocompleteCommandMixin, Ca
             "name": str(
                 self.name
             ),  # Might as well stringify the name, will come in handy if people try using numbers.
-            "description": str(self.description),  # Might as well do the same with the description.
+            "description": str(
+                self.description
+            ),  # Might as well do the same with the description.
             "name_localizations": self.get_name_localization_payload(),
             "description_localizations": self.get_description_localization_payload(),
         }
@@ -2848,9 +2856,13 @@ class SlashApplicationSubcommand(SlashCommandMixin, AutocompleteCommandMixin, Ca
                 parent_cog=self.parent_cog,
                 inherit_hooks=inherit_hooks,
             )
-            self._children[
+            self.children[
                 ret.name
-                or (func.callback.__name__ if isinstance(func, CallbackWrapper) else func.__name__)
+                or (
+                    func.callback.__name__
+                    if isinstance(func, CallbackWrapper) and func.callback is not None
+                    else getattr(func, "__name__", "unknown")
+                )
             ] = ret
             return ret
 
@@ -3050,7 +3062,11 @@ class SlashApplicationCommand(SlashCommandMixin, BaseApplicationCommand, Autocom
             )
             self.children[
                 ret.name
-                or (func.callback.__name__ if isinstance(func, CallbackWrapper) else func.__name__)
+                or (
+                    func.callback.__name__
+                    if isinstance(func, CallbackWrapper) and func.callback is not None
+                    else getattr(func, "__name__", "unknown")
+                )
             ] = ret
             return ret
 
@@ -3488,20 +3504,17 @@ def deep_dictionary_check(dict1: dict, dict2: dict) -> bool:
         )
         return False
 
-    for key in dict1:
-        if (
-            isinstance(dict1[key], dict)
-            and isinstance(dict2[key], dict)
-            and not deep_dictionary_check(dict1[key], dict2[key])
-        ):
-            return False
-
-        if dict1[key] != dict2[key]:
+    for key, value1 in dict1.items():
+        value2 = dict2[key]
+        if isinstance(value1, dict) and isinstance(value2, dict):
+            if not deep_dictionary_check(value1, value2):
+                return False
+        elif value1 != value2:
             _log.debug(
                 "Dict1 and Dict2 values are not equal, not valid payload.\n Key: %s, values %s vs %s",
                 key,
-                dict1[key],
-                dict2[key],
+                value1,
+                value2,
             )
             return False
 
@@ -3539,7 +3552,7 @@ def unpack_annotated(given_annotation: Any, resolve_list: Optional[list[type]] =
         # arg_list = typing.get_args(given_annotation)  # noqa: ERA001
         arg_list = typing_extensions.get_args(given_annotation)
         for arg in reversed(arg_list[1:]):
-            if arg in resolve_list or isinstance(arg, type) and issubclass(arg, OptionConverter):
+            if arg in resolve_list or (isinstance(arg, type) and issubclass(arg, OptionConverter)):
                 located_annotation = arg
                 break
 

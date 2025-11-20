@@ -10,6 +10,7 @@ import nextcord.utils
 from nextcord.application_command import ClientCog, _cog_special_method
 
 from ._types import _BaseCommand
+from .core import GroupMixin
 
 if TYPE_CHECKING:
     from typing_extensions import Self
@@ -19,8 +20,8 @@ if TYPE_CHECKING:
     from .core import Command
 
 __all__ = (
-    "CogMeta",
     "Cog",
+    "CogMeta",
 )
 
 CogT = TypeVar("CogT", bound="Cog")
@@ -113,10 +114,8 @@ class CogMeta(type):
         new_cls = super().__new__(cls, name, bases, attrs, **kwargs)
         for base in reversed(new_cls.__mro__):
             for elem, value in base.__dict__.items():
-                if elem in commands:
-                    del commands[elem]
-                if elem in listeners:
-                    del listeners[elem]
+                commands.pop(elem, None)
+                listeners.pop(elem, None)
 
                 is_static_method = isinstance(value, staticmethod)
                 if is_static_method:
@@ -237,8 +236,6 @@ class Cog(ClientCog, metaclass=CogMeta):
         Union[:class:`.Command`, :class:`.Group`]
             A command or group from the cog.
         """
-        from .core import GroupMixin
-
         for command in self.__cog_commands__:
             if command.parent is None:
                 yield command
