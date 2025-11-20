@@ -1217,9 +1217,7 @@ class Webhook(BaseWebhook):
         if prefer_auth and self.auth_token:
             data = await adapter.fetch_webhook(self.id, self.auth_token, session=self.session)
         elif self.token:
-            data = await adapter.fetch_webhook_with_token(
-                self.id, self.token, session=self.session
-            )
+            data = await adapter.fetch_webhook_with_token(self.id, self.token, session=self.session)
         else:
             raise InvalidArgument("This webhook does not have a token associated with it")
 

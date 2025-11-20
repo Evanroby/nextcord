@@ -657,9 +657,7 @@ class TextChannel(abc.Messageable, abc.GuildChannel, Hashable, PinsMixin):
             raise ClientException("The channel must be a news channel.")
 
         if not isinstance(destination, TextChannel):
-            raise InvalidArgument(
-                f"Expected TextChannel received {destination.__class__.__name__}"
-            )
+            raise InvalidArgument(f"Expected TextChannel received {destination.__class__.__name__}")
         data = await self._state.http.follow_webhook(
             self.id, webhook_channel_id=destination.id, reason=reason
         )
@@ -2976,9 +2974,7 @@ class PartialMessageable(abc.Messageable, Hashable):
         The channel type associated with this partial messageable, if given.
     """
 
-    def __init__(
-        self, state: ConnectionState, id: int, type: Optional[ChannelType] = None
-    ) -> None:
+    def __init__(self, state: ConnectionState, id: int, type: Optional[ChannelType] = None) -> None:
         self._state: ConnectionState = state
         self._channel: Object = Object(id=id)
         self.id: int = id

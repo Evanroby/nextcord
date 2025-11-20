@@ -23,9 +23,7 @@ class EmbedProxy:
         return len(self.__dict__)
 
     def __repr__(self) -> str:
-        inner = ", ".join(
-            (f"{k}={v!r}" for k, v in self.__dict__.items() if not k.startswith("_"))
-        )
+        inner = ", ".join((f"{k}={v!r}" for k, v in self.__dict__.items() if not k.startswith("_")))
         return f"EmbedProxy({inner})"
 
     def __getattr__(self, _: str) -> None:
@@ -700,9 +698,7 @@ class Embed:
         else:
             if timestamp:
                 if timestamp.tzinfo:
-                    result["timestamp"] = timestamp.astimezone(
-                        tz=datetime.timezone.utc
-                    ).isoformat()
+                    result["timestamp"] = timestamp.astimezone(tz=datetime.timezone.utc).isoformat()
                 else:
                     result["timestamp"] = timestamp.replace(
                         tzinfo=datetime.timezone.utc

@@ -1897,9 +1897,7 @@ class Guild(Hashable):
 
         if explicit_content_filter is not MISSING:
             if not isinstance(explicit_content_filter, ContentFilter):
-                raise InvalidArgument(
-                    "explicit_content_filter field must be of type ContentFilter"
-                )
+                raise InvalidArgument("explicit_content_filter field must be of type ContentFilter")
 
             fields["explicit_content_filter"] = explicit_content_filter.value
 

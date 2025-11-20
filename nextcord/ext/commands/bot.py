@@ -668,9 +668,7 @@ class BotBase(GroupMixin):
             if not has_kwargs:
                 raise errors.InvalidSetupArguments(key)
             if not isinstance(extras, dict):
-                raise errors.ExtensionFailed(
-                    key, TypeError("Expected 'extras' to be a dictionary")
-                )
+                raise errors.ExtensionFailed(key, TypeError("Expected 'extras' to be a dictionary"))
 
         extras = extras or {}
         try:
@@ -1127,11 +1125,7 @@ class BotBase(GroupMixin):
 
         for submodule_path in submodule_paths:
             submodules = [
-                (
-                    f"{name}.{submodule[:-3]}"
-                    if submodule.endswith(".py")
-                    else f"{name}.{submodule}"
-                )
+                (f"{name}.{submodule[:-3]}" if submodule.endswith(".py") else f"{name}.{submodule}")
                 for submodule in os.listdir(submodule_path)
                 if not submodule.startswith("_")
             ]

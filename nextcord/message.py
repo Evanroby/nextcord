@@ -1599,9 +1599,7 @@ class Message(Hashable):
         ):
             tier_name = self.role_subscription.tier_name
             total_months_subscribed = self.role_subscription.total_months_subscribed
-            months = (
-                f"{total_months_subscribed} month{'s' if total_months_subscribed != 1 else ''}"
-            )
+            months = f"{total_months_subscribed} month{'s' if total_months_subscribed != 1 else ''}"
             if self.role_subscription.is_renewal:
                 return f"{self.author.name} renewed {tier_name} and has been a subscriber of {self.guild} for {months}!"
 

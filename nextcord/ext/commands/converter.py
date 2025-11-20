@@ -968,9 +968,7 @@ class clean_content(Converter[str]):
                 m = _utils_get(msg.mentions, id=id) or ctx.guild.get_member(id)  # type: ignore
                 # [in a guild if we are here]
                 return (
-                    f"@{m.display_name if self.use_nicknames else m.name}"
-                    if m
-                    else "@deleted-user"
+                    f"@{m.display_name if self.use_nicknames else m.name}" if m else "@deleted-user"
                 )
 
             def resolve_role(id: int) -> str:  # pyright: ignore[reportRedeclaration]
@@ -1120,9 +1118,7 @@ CONVERTER_MAPPING: Dict[Type[Any], Any] = {
 }
 
 
-async def _actual_conversion(
-    ctx: Context, converter: Any, argument: str, param: inspect.Parameter
-):
+async def _actual_conversion(ctx: Context, converter: Any, argument: str, param: inspect.Parameter):
     if converter is bool:
         return _convert_to_bool(argument)
 

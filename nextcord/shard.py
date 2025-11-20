@@ -530,8 +530,7 @@ class AutoShardedClient(Client):
                 await vc.disconnect(force=True)
 
         to_close = [
-            asyncio.ensure_future(shard.close(), loop=self.loop)
-            for shard in self.__shards.values()
+            asyncio.ensure_future(shard.close(), loop=self.loop) for shard in self.__shards.values()
         ]
         if to_close:
             await asyncio.wait(to_close)

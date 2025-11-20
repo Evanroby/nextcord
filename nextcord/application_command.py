@@ -965,9 +965,7 @@ class CallbackMixin:
             if (before_invoke := self.cog_before_invoke) is not None:
                 await self._invoke_hook_param_check(before_invoke, interaction)
 
-            if (
-                before_invoke := interaction.client._application_command_before_invoke
-            ) is not None:
+            if (before_invoke := interaction.client._application_command_before_invoke) is not None:
                 await self._invoke_hook_param_check(before_invoke, interaction)
 
             try:
@@ -1581,9 +1579,9 @@ class SlashCommandOption(BaseCommandOption, SlashOption, AutocompleteOptionMixin
                             f"{self.error_name} | Annotation {anno} is incompatible with {found_type} \n| {typehint_origin}\n| {parameter.annotation}\n| {grouped_annotations}"
                         )
 
-                    if not (
-                        isinstance(anno, (ApplicationCommandOptionType, OptionConverter))
-                    ) and (channel_types := self.channel_mapping.get(anno)):
+                    if not (isinstance(anno, (ApplicationCommandOptionType, OptionConverter))) and (
+                        channel_types := self.channel_mapping.get(anno)
+                    ):
                         found_channel_types.extend(channel_types)
 
             annotation_type = found_type
@@ -2310,9 +2308,7 @@ class BaseApplicationCommand(CallbackMixin, CallbackWrapperMixin):
             "name": str(
                 self.name
             ),  # Might as well stringify the name, will come in handy if people try using numbers.
-            "description": str(
-                self.description
-            ),  # Might as well do the same with the description.
+            "description": str(self.description),  # Might as well do the same with the description.
             "name_localizations": self.get_name_localization_payload(),
             "description_localizations": self.get_description_localization_payload(),
         }
@@ -2641,9 +2637,7 @@ class BaseApplicationCommand(CallbackMixin, CallbackWrapperMixin):
         raise NotImplementedError
 
 
-class SlashApplicationSubcommand(
-    SlashCommandMixin, AutocompleteCommandMixin, CallbackWrapperMixin
-):
+class SlashApplicationSubcommand(SlashCommandMixin, AutocompleteCommandMixin, CallbackWrapperMixin):
     """Class representing a subcommand or subcommand group of a slash command."""
 
     def __init__(
@@ -2775,9 +2769,7 @@ class SlashApplicationSubcommand(
             "name": str(
                 self.name
             ),  # Might as well stringify the name, will come in handy if people try using numbers.
-            "description": str(
-                self.description
-            ),  # Might as well do the same with the description.
+            "description": str(self.description),  # Might as well do the same with the description.
             "name_localizations": self.get_name_localization_payload(),
             "description_localizations": self.get_description_localization_payload(),
         }

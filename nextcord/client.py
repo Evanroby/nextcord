@@ -637,9 +637,7 @@ class Client:
         # toes of those who need to override their own hook.
         await self.before_identify_hook(shard_id, initial=initial)
 
-    async def before_identify_hook(
-        self, shard_id: Optional[int], *, initial: bool = False
-    ) -> None:
+    async def before_identify_hook(self, shard_id: Optional[int], *, initial: bool = False) -> None:
         """|coro|
 
         A hook that is called before IDENTIFYing a session. This is useful

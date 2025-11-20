@@ -852,9 +852,7 @@ class HelpCommand:
             try:
                 found = cmd.all_commands.get(key)
             except AttributeError:
-                string = await maybe_coro(
-                    self.subcommand_not_found, cmd, self.remove_mentions(key)
-                )
+                string = await maybe_coro(self.subcommand_not_found, cmd, self.remove_mentions(key))
                 return await self.send_error_message(string)
             else:
                 if found is None:

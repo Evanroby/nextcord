@@ -407,9 +407,7 @@ class Member(abc.Messageable, _UserTag):
         )
         if original != modified:
             to_return = User._copy(self._user)
-            u.name, u._avatar, u.discriminator, u.global_name, u._public_flags, u._banner = (
-                modified
-            )
+            u.name, u._avatar, u.discriminator, u.global_name, u._public_flags, u._banner = modified
             # Signal to dispatch on_user_update
             return to_return, u
         return None

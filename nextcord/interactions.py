@@ -1447,8 +1447,7 @@ class PartialInteractionMessage(_InteractionMessageMixin):
 
     def __eq__(self, other: object) -> bool:
         return (
-            isinstance(other, PartialInteractionMessage)
-            and self._interaction == other._interaction
+            isinstance(other, PartialInteractionMessage) and self._interaction == other._interaction
         )
 
     def __ne__(self, other: object) -> bool:
